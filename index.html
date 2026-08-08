@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de Logros</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
   <style>
     :root {
       --bg: #0f0f13;
@@ -217,21 +216,6 @@
 
     .btn-sound:hover { background: #353b48; }
 
-    .check-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .check-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent);
-    }
-
-    .check-row label { margin: 0; cursor: pointer; color: var(--text); }
-
     .preview-wrap { display: flex; flex-direction: column; gap: 14px; }
 
     .preview-card {
@@ -358,7 +342,7 @@
   <div class="container">
     <header>
       <h1>🏆 Generador de Logros</h1>
-      <p>Personaliza imagen, textos, estilos y descarga PNG, GIF o el sonido de emblema</p>
+      <p>Personaliza imagen, textos, estilos y descarga PNG o el sonido de emblema</p>
     </header>
 
     <div class="layout">
@@ -396,7 +380,17 @@
             <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
             <option value="Verdana, Geneva, sans-serif">Verdana</option>
             <option value="'Lucida Console', Monaco, monospace">Lucida Console</option>
+            <option value="__custom__" id="customFontOption" disabled>Fuente importada</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label>Importar fuente (.ttf, .otf, .woff, .woff2)</label>
+          <div class="upload-zone" id="fontUploadZone" style="padding:14px 12px;">
+            <input type="file" id="fontInput" accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2,application/font-woff,application/font-woff2,application/x-font-ttf,application/x-font-otf">
+            <div class="icon" style="font-size:1.3rem;margin-bottom:4px;">🔤</div>
+            <p style="font-size:0.82rem;">Haz clic o arrastra una fuente</p>
+            <div class="filename" id="fontFileName"></div>
+          </div>
         </div>
 
         <div class="row-2">
@@ -426,25 +420,9 @@
           </div>
         </div>
 
-        <h2>GIF animado</h2>
-        <div class="check-row">
-          <input type="checkbox" id="gifMode">
-          <label for="gifMode">Generar como GIF</label>
-        </div>
-        <div class="form-group" id="gifOptions" style="display:none;">
-          <label for="gifDuration">Duración total (segundos)</label>
-          <input type="number" id="gifDuration" min="0.5" max="10" value="2" step="0.5">
-          <label for="gifAnim" style="margin-top:8px;">Animación</label>
-          <select id="gifAnim">
-            <option value="fade">Aparecer (fade in)</option>
-            <option value="pulse">Pulso de brillo</option>
-            <option value="shine">Brillo deslizante</option>
-          </select>
-        </div>
-
         <h2>Descargas</h2>
         <button class="btn btn-primary" id="downloadBtn" disabled>
-          ⬇️ Descargar imagen / GIF
+          ⬇️ Descargar imagen
         </button>
         <button class="btn btn-sound" id="soundBtn">
           🔊 Descargar emblema.mp3
@@ -473,7 +451,7 @@
             </div>
           </div>
         </div>
-        <p class="size-hint">PNG: 800×220 px · GIF: animado según duración elegida</p>
+        <p class="size-hint">La imagen se descarga en alta resolución (800×220 px)</p>
       </div>
     </div>
 
@@ -500,21 +478,29 @@
     const ctx = canvas.getContext('2d');
 
     const fontSelect = document.getElementById('fontSelect');
+    const fontInput = document.getElementById('fontInput');
+    const fontUploadZone = document.getElementById('fontUploadZone');
+    const fontFileName = document.getElementById('fontFileName');
+    const customFontOption = document.getElementById('customFontOption');
     const nameColor = document.getElementById('nameColor');
     const descColor = document.getElementById('descColor');
     const opacityRange = document.getElementById('opacityRange');
     const opacityVal = document.getElementById('opacityVal');
     const strokeColor = document.getElementById('strokeColor');
     const strokeWidth = document.getElementById('strokeWidth');
-    const gifMode = document.getElementById('gifMode');
-    const gifOptions = document.getElementById('gifOptions');
-    const gifDuration = document.getElementById('gifDuration');
-    const gifAnim = document.getElementById('gifAnim');
 
     let currentImage = null;
+    let customFontFamily = null;
+
+    function getActiveFont() {
+      if (fontSelect.value === '__custom__' && customFontFamily) {
+        return "'" + customFontFamily + "', sans-serif";
+      }
+      return fontSelect.value;
+    }
 
     function applyPreviewStyles() {
-      const font = fontSelect.value;
+      const font = getActiveFont();
       const op = opacityRange.value / 100;
       const sw = parseFloat(strokeWidth.value) || 0;
       const sc = strokeColor.value;
@@ -553,11 +539,65 @@
     strokeColor.addEventListener('input', applyPreviewStyles);
     strokeWidth.addEventListener('input', applyPreviewStyles);
 
-    gifMode.addEventListener('change', () => {
-      gifOptions.style.display = gifMode.checked ? 'block' : 'none';
-      downloadBtn.textContent = gifMode.checked ? '⬇️ Descargar GIF' : '⬇️ Descargar imagen';
+    // Custom font upload
+    fontInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) loadCustomFont(this.files[0]);
     });
 
+    fontUploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fontUploadZone.classList.add('dragover');
+    });
+    fontUploadZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fontUploadZone.classList.remove('dragover');
+    });
+    fontUploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fontUploadZone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files && files[0]) loadCustomFont(files[0]);
+    });
+
+    async function loadCustomFont(file) {
+      const validExt = /\.(ttf|otf|woff2?)$/i;
+      if (!validExt.test(file.name) && !file.type.includes('font') && !file.type.includes('octet')) {
+        alert('Selecciona un archivo de fuente válido (.ttf, .otf, .woff, .woff2)');
+        return;
+      }
+
+      fontFileName.textContent = 'Cargando...';
+      statusEl.textContent = 'Cargando fuente...';
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const familyName = 'CustomFont_' + Date.now();
+        const fontFace = new FontFace(familyName, buffer);
+
+        await fontFace.load();
+        document.fonts.add(fontFace);
+
+        customFontFamily = familyName;
+        customFontOption.textContent = 'Fuente: ' + file.name.replace(/\.[^.]+$/, '');
+        customFontOption.disabled = false;
+        fontSelect.value = '__custom__';
+        fontFileName.textContent = file.name;
+
+        applyPreviewStyles();
+        statusEl.textContent = 'Fuente cargada: ' + file.name;
+        setTimeout(() => { if (statusEl.textContent.includes('Fuente cargada')) statusEl.textContent = ''; }, 2500);
+      } catch (err) {
+        console.error(err);
+        fontFileName.textContent = '';
+        statusEl.textContent = '';
+        alert('No se pudo cargar la fuente. Prueba con otro archivo (.ttf / .otf recomendados).');
+      }
+    }
+
+    // Image load
     imageInput.addEventListener('change', function () {
       if (this.files && this.files[0]) loadImage(this.files[0]);
     });
@@ -612,7 +652,7 @@
       downloadBtn.disabled = !(hasImage && hasText);
     }
 
-    function drawFrame(progress) {
+    function drawFrame() {
       const outW = 800;
       const outH = 220;
       const imgSize = 220;
@@ -650,25 +690,14 @@
       ctx.lineTo(imgSize, outH);
       ctx.stroke();
 
-      const font = fontSelect.value;
-      const op = (opacityRange.value / 100) * (gifMode.checked && gifAnim.value === 'fade' ? progress : 1);
+      const font = getActiveFont();
+      const baseOp = opacityRange.value / 100;
       const swStroke = parseFloat(strokeWidth.value) || 0;
       const sc = strokeColor.value;
       const textX = imgSize + 28;
       const maxTextWidth = outW - textX - 28;
 
-      let extraAlpha = 1;
-      let shineX = -200;
-
-      if (gifMode.checked) {
-        if (gifAnim.value === 'pulse') {
-          extraAlpha = 0.7 + 0.3 * Math.sin(progress * Math.PI * 2);
-        } else if (gifAnim.value === 'shine') {
-          shineX = -100 + progress * (outW + 200);
-        }
-      }
-
-      ctx.globalAlpha = op * extraAlpha;
+      ctx.globalAlpha = baseOp;
 
       ctx.font = 'bold 32px ' + font;
       ctx.fillStyle = nameColor.value;
@@ -691,15 +720,6 @@
       }
 
       ctx.globalAlpha = 1;
-
-      if (gifMode.checked && gifAnim.value === 'shine') {
-        const grd = ctx.createLinearGradient(shineX - 80, 0, shineX + 80, 0);
-        grd.addColorStop(0, 'rgba(255,255,255,0)');
-        grd.addColorStop(0.5, 'rgba(255,255,255,0.25)');
-        grd.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, outW, outH);
-      }
     }
 
     function wrapText(context, text, x, y, maxWidth, lineHeight) {
@@ -736,68 +756,18 @@
       context.strokeText(line.trim(), x, currentY);
     }
 
-    downloadBtn.addEventListener('click', async () => {
+    downloadBtn.addEventListener('click', () => {
       if (!currentImage) return;
 
-      if (gifMode.checked) {
-        await generateGif();
-      } else {
-        drawFrame(1);
-        const link = document.createElement('a');
-        const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
-        link.download = 'logro-' + safeName + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        statusEl.textContent = 'PNG descargado';
-        setTimeout(() => statusEl.textContent = '', 2500);
-      }
+      drawFrame();
+      const link = document.createElement('a');
+      const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
+      link.download = 'logro-' + safeName + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      statusEl.textContent = 'PNG descargado';
+      setTimeout(() => statusEl.textContent = '', 2500);
     });
-
-    async function generateGif() {
-      if (typeof GIF === 'undefined') {
-        alert('No se pudo cargar la librería GIF. Revisa tu conexión a internet.');
-        return;
-      }
-
-      statusEl.textContent = 'Generando GIF...';
-      downloadBtn.disabled = true;
-
-      const duration = Math.max(0.5, parseFloat(gifDuration.value) || 2);
-      const fps = 12;
-      const totalFrames = Math.round(duration * fps);
-      const delay = Math.round(1000 / fps);
-
-      const gif = new GIF({
-        workers: 2,
-        quality: 10,
-        width: 800,
-        height: 220,
-        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
-      });
-
-      for (let i = 0; i < totalFrames; i++) {
-        const progress = i / (totalFrames - 1 || 1);
-        drawFrame(progress);
-        gif.addFrame(ctx, { copy: true, delay: delay });
-      }
-
-      gif.on('finished', function (blob) {
-        const link = document.createElement('a');
-        const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
-        link.download = 'logro-' + safeName + '.gif';
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        statusEl.textContent = 'GIF descargado (' + duration + 's)';
-        downloadBtn.disabled = false;
-        setTimeout(() => statusEl.textContent = '', 3000);
-      });
-
-      gif.on('progress', function (p) {
-        statusEl.textContent = 'Generando GIF... ' + Math.round(p * 100) + '%';
-      });
-
-      gif.render();
-    }
 
     soundBtn.addEventListener('click', () => {
       const link = document.createElement('a');
@@ -820,15 +790,16 @@
       previewImageBox.classList.remove('has-image');
       currentImage = null;
       fontSelect.value = "'Segoe UI', system-ui, sans-serif";
+      customFontFamily = null;
+      customFontOption.textContent = 'Fuente importada';
+      customFontOption.disabled = true;
+      fontInput.value = '';
+      fontFileName.textContent = '';
       nameColor.value = '#f0c14b';
       descColor.value = '#a0a0b0';
       opacityRange.value = 100;
       strokeColor.value = '#000000';
       strokeWidth.value = 0;
-      gifMode.checked = false;
-      gifOptions.style.display = 'none';
-      gifDuration.value = 2;
-      downloadBtn.textContent = '⬇️ Descargar imagen';
       applyPreviewStyles();
       updateDownloadState();
       statusEl.textContent = '';
