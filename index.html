@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de Logros</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
   <style>
     :root {
       --bg: #0f0f13;
@@ -27,9 +29,9 @@
       line-height: 1.5;
     }
 
-    .container { max-width: 1100px; margin: 0 auto; }
+    .container { max-width: 1200px; margin: 0 auto; }
 
-    header { text-align: center; margin-bottom: 32px; }
+    header { text-align: center; margin-bottom: 28px; }
 
     header h1 {
       font-size: 1.9rem;
@@ -45,12 +47,12 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 28px;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
       align-items: start;
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
     }
 
@@ -58,51 +60,79 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 22px;
+      padding: 20px;
     }
 
     .panel h2 {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
-      margin-bottom: 18px;
+      margin-bottom: 14px;
+      margin-top: 8px;
     }
 
-    .form-group { margin-bottom: 18px; }
+    .panel h2:first-child { margin-top: 0; }
+
+    .form-group { margin-bottom: 14px; }
 
     label {
       display: block;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     input[type="text"],
+    input[type="number"],
+    select,
     textarea {
       width: 100%;
       background: #121218;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 9px 11px;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-family: inherit;
       transition: border-color 0.2s;
     }
 
     input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
     textarea:focus {
       outline: none;
       border-color: var(--accent);
     }
 
-    textarea { resize: vertical; min-height: 80px; }
+    textarea { resize: vertical; min-height: 70px; }
+
+    input[type="color"] {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #121218;
+      cursor: pointer;
+      padding: 3px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
     .upload-zone {
       border: 2px dashed var(--border);
       border-radius: 10px;
-      padding: 28px 16px;
+      padding: 22px 14px;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
@@ -126,11 +156,11 @@
       z-index: 2;
     }
 
-    .upload-zone .icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.7; }
-    .upload-zone p { font-size: 0.9rem; color: var(--muted); }
+    .upload-zone .icon { font-size: 1.8rem; margin-bottom: 6px; opacity: 0.7; }
+    .upload-zone p { font-size: 0.88rem; color: var(--muted); }
     .upload-zone .filename {
-      margin-top: 8px;
-      font-size: 0.82rem;
+      margin-top: 6px;
+      font-size: 0.8rem;
       color: var(--accent);
       word-break: break-all;
     }
@@ -141,10 +171,10 @@
       justify-content: center;
       gap: 8px;
       width: 100%;
-      padding: 12px 18px;
+      padding: 11px 16px;
       border: none;
       border-radius: 9px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
@@ -155,7 +185,7 @@
     .btn-primary {
       background: var(--accent);
       color: white;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .btn-primary:hover { background: var(--accent-hover); }
@@ -170,7 +200,7 @@
       background: transparent;
       border: 1px solid var(--border);
       color: var(--muted);
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .btn-secondary:hover {
@@ -178,7 +208,31 @@
       color: var(--text);
     }
 
-    .preview-wrap { display: flex; flex-direction: column; gap: 16px; }
+    .btn-sound {
+      background: #2d3436;
+      color: #dfe6e9;
+      margin-top: 8px;
+      border: 1px solid #636e72;
+    }
+
+    .btn-sound:hover { background: #353b48; }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .check-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .check-row label { margin: 0; cursor: pointer; color: var(--text); }
+
+    .preview-wrap { display: flex; flex-direction: column; gap: 14px; }
 
     .preview-card {
       background: linear-gradient(145deg, #1e1e28, #16161e);
@@ -245,14 +299,12 @@
     .ach-name {
       font-size: 1.25rem;
       font-weight: 700;
-      color: var(--gold);
       line-height: 1.25;
       word-break: break-word;
     }
 
     .ach-desc {
       font-size: 0.88rem;
-      color: var(--muted);
       line-height: 1.4;
       word-break: break-word;
     }
@@ -261,11 +313,15 @@
       content: "Nombre del logro";
       color: #555;
       font-weight: 500;
+      -webkit-text-stroke: 0;
+      text-shadow: none;
     }
 
     .ach-desc:empty::before {
       content: "Descripción del logro...";
       color: #444;
+      -webkit-text-stroke: 0;
+      text-shadow: none;
     }
 
     .size-hint {
@@ -277,10 +333,24 @@
     canvas { display: none; }
 
     .footer-note {
-      margin-top: 28px;
+      margin-top: 24px;
       text-align: center;
       font-size: 0.8rem;
       color: #555;
+    }
+
+    .status {
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-align: center;
+      min-height: 1.2em;
+      margin-top: 6px;
+    }
+
+    .range-val {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
     }
   </style>
 </head>
@@ -288,15 +358,13 @@
   <div class="container">
     <header>
       <h1>🏆 Generador de Logros</h1>
-      <p>Sube una imagen, escribe el nombre y la descripción, y descarga tu logro</p>
+      <p>Personaliza imagen, textos, estilos y descarga PNG, GIF o el sonido de emblema</p>
     </header>
 
     <div class="layout">
       <div class="panel">
-        <h2>Configuración</h2>
-
+        <h2>Imagen</h2>
         <div class="form-group">
-          <label>Imagen del logro</label>
           <div class="upload-zone" id="uploadZone">
             <input type="file" id="imageInput" accept="image/*">
             <div class="icon">📷</div>
@@ -305,22 +373,86 @@
           </div>
         </div>
 
+        <h2>Textos</h2>
         <div class="form-group">
           <label for="titleInput">Nombre del logro</label>
           <input type="text" id="titleInput" placeholder="Ej: Maestro del código" maxlength="60">
         </div>
-
         <div class="form-group">
           <label for="descInput">Descripción</label>
-          <textarea id="descInput" placeholder="Ej: Completaste todos los desafíos de programación" maxlength="180"></textarea>
+          <textarea id="descInput" placeholder="Ej: Completaste todos los desafíos" maxlength="180"></textarea>
         </div>
 
+        <h2>Estilo de textos</h2>
+        <div class="form-group">
+          <label for="fontSelect">Fuente</label>
+          <select id="fontSelect">
+            <option value="'Segoe UI', system-ui, sans-serif">Segoe UI</option>
+            <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+            <option value="Arial, Helvetica, sans-serif">Arial</option>
+            <option value="'Courier New', Courier, monospace">Courier New</option>
+            <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+            <option value="'Comic Sans MS', cursive">Comic Sans</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+            <option value="Verdana, Geneva, sans-serif">Verdana</option>
+            <option value="'Lucida Console', Monaco, monospace">Lucida Console</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="nameColor">Color nombre</label>
+            <input type="color" id="nameColor" value="#f0c14b">
+          </div>
+          <div class="form-group">
+            <label for="descColor">Color descripción</label>
+            <input type="color" id="descColor" value="#a0a0b0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="opacityRange">Transparencia <span class="range-val" id="opacityVal">100%</span></label>
+          <input type="range" id="opacityRange" min="10" max="100" value="100">
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="strokeColor">Color borde</label>
+            <input type="color" id="strokeColor" value="#000000">
+          </div>
+          <div class="form-group">
+            <label for="strokeWidth">Grosor borde</label>
+            <input type="number" id="strokeWidth" min="0" max="8" value="0" step="0.5">
+          </div>
+        </div>
+
+        <h2>GIF animado</h2>
+        <div class="check-row">
+          <input type="checkbox" id="gifMode">
+          <label for="gifMode">Generar como GIF</label>
+        </div>
+        <div class="form-group" id="gifOptions" style="display:none;">
+          <label for="gifDuration">Duración total (segundos)</label>
+          <input type="number" id="gifDuration" min="0.5" max="10" value="2" step="0.5">
+          <label for="gifAnim" style="margin-top:8px;">Animación</label>
+          <select id="gifAnim">
+            <option value="fade">Aparecer (fade in)</option>
+            <option value="pulse">Pulso de brillo</option>
+            <option value="shine">Brillo deslizante</option>
+          </select>
+        </div>
+
+        <h2>Descargas</h2>
         <button class="btn btn-primary" id="downloadBtn" disabled>
-          ⬇️ Descargar imagen
+          ⬇️ Descargar imagen / GIF
+        </button>
+        <button class="btn btn-sound" id="soundBtn">
+          🔊 Descargar emblema.mp3
         </button>
         <button class="btn btn-secondary" id="resetBtn">
           Limpiar todo
         </button>
+        <div class="status" id="status"></div>
       </div>
 
       <div class="preview-wrap">
@@ -341,7 +473,7 @@
             </div>
           </div>
         </div>
-        <p class="size-hint">La imagen descargada se genera en alta resolución (800×220 px)</p>
+        <p class="size-hint">PNG: 800×220 px · GIF: animado según duración elegida</p>
       </div>
     </div>
 
@@ -362,25 +494,72 @@
     const previewDesc = document.getElementById('previewDesc');
     const downloadBtn = document.getElementById('downloadBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const soundBtn = document.getElementById('soundBtn');
+    const statusEl = document.getElementById('status');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
+    const fontSelect = document.getElementById('fontSelect');
+    const nameColor = document.getElementById('nameColor');
+    const descColor = document.getElementById('descColor');
+    const opacityRange = document.getElementById('opacityRange');
+    const opacityVal = document.getElementById('opacityVal');
+    const strokeColor = document.getElementById('strokeColor');
+    const strokeWidth = document.getElementById('strokeWidth');
+    const gifMode = document.getElementById('gifMode');
+    const gifOptions = document.getElementById('gifOptions');
+    const gifDuration = document.getElementById('gifDuration');
+    const gifAnim = document.getElementById('gifAnim');
+
     let currentImage = null;
 
-    titleInput.addEventListener('input', () => {
-      previewName.textContent = titleInput.value;
-      updateDownloadState();
-    });
+    function applyPreviewStyles() {
+      const font = fontSelect.value;
+      const op = opacityRange.value / 100;
+      const sw = parseFloat(strokeWidth.value) || 0;
+      const sc = strokeColor.value;
 
-    descInput.addEventListener('input', () => {
+      opacityVal.textContent = opacityRange.value + '%';
+
+      [previewName, previewDesc].forEach(el => {
+        el.style.fontFamily = font;
+        el.style.opacity = op;
+        if (sw > 0) {
+          el.style.webkitTextStroke = sw + 'px ' + sc;
+          el.style.textShadow = 'none';
+        } else {
+          el.style.webkitTextStroke = '';
+          el.style.textShadow = '';
+        }
+      });
+
+      previewName.style.color = nameColor.value;
+      previewDesc.style.color = descColor.value;
+    }
+
+    function updateTexts() {
+      previewName.textContent = titleInput.value;
       previewDesc.textContent = descInput.value;
+      applyPreviewStyles();
       updateDownloadState();
+    }
+
+    titleInput.addEventListener('input', updateTexts);
+    descInput.addEventListener('input', updateTexts);
+    fontSelect.addEventListener('change', applyPreviewStyles);
+    nameColor.addEventListener('input', applyPreviewStyles);
+    descColor.addEventListener('input', applyPreviewStyles);
+    opacityRange.addEventListener('input', applyPreviewStyles);
+    strokeColor.addEventListener('input', applyPreviewStyles);
+    strokeWidth.addEventListener('input', applyPreviewStyles);
+
+    gifMode.addEventListener('change', () => {
+      gifOptions.style.display = gifMode.checked ? 'block' : 'none';
+      downloadBtn.textContent = gifMode.checked ? '⬇️ Descargar GIF' : '⬇️ Descargar imagen';
     });
 
     imageInput.addEventListener('change', function () {
-      if (this.files && this.files[0]) {
-        loadImage(this.files[0]);
-      }
+      if (this.files && this.files[0]) loadImage(this.files[0]);
     });
 
     uploadZone.addEventListener('dragover', (e) => {
@@ -388,13 +567,11 @@
       e.stopPropagation();
       uploadZone.classList.add('dragover');
     });
-
     uploadZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
       e.stopPropagation();
       uploadZone.classList.remove('dragover');
     });
-
     uploadZone.addEventListener('drop', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -407,16 +584,13 @@
 
     function loadImage(file) {
       if (!file || !file.type.startsWith('image/')) {
-        alert('Por favor selecciona un archivo de imagen válido.');
+        alert('Selecciona un archivo de imagen válido.');
         return;
       }
-
       fileName.textContent = file.name;
-
       const reader = new FileReader();
       reader.onload = function (e) {
         const dataUrl = e.target.result;
-
         const img = new Image();
         img.onload = function () {
           currentImage = img;
@@ -425,14 +599,10 @@
           previewImageBox.classList.add('has-image');
           updateDownloadState();
         };
-        img.onerror = function () {
-          alert('No se pudo cargar la imagen. Prueba con otro archivo.');
-        };
+        img.onerror = () => alert('No se pudo cargar la imagen.');
         img.src = dataUrl;
       };
-      reader.onerror = function () {
-        alert('Error al leer el archivo.');
-      };
+      reader.onerror = () => alert('Error al leer el archivo.');
       reader.readAsDataURL(file);
     }
 
@@ -442,9 +612,7 @@
       downloadBtn.disabled = !(hasImage && hasText);
     }
 
-    downloadBtn.addEventListener('click', () => {
-      if (!currentImage) return;
-
+    function drawFrame(progress) {
       const outW = 800;
       const outH = 220;
       const imgSize = 220;
@@ -482,37 +650,65 @@
       ctx.lineTo(imgSize, outH);
       ctx.stroke();
 
+      const font = fontSelect.value;
+      const op = (opacityRange.value / 100) * (gifMode.checked && gifAnim.value === 'fade' ? progress : 1);
+      const swStroke = parseFloat(strokeWidth.value) || 0;
+      const sc = strokeColor.value;
       const textX = imgSize + 28;
       const maxTextWidth = outW - textX - 28;
 
-      ctx.fillStyle = '#f0c14b';
-      ctx.font = 'bold 32px "Segoe UI", system-ui, sans-serif';
+      let extraAlpha = 1;
+      let shineX = -200;
+
+      if (gifMode.checked) {
+        if (gifAnim.value === 'pulse') {
+          extraAlpha = 0.7 + 0.3 * Math.sin(progress * Math.PI * 2);
+        } else if (gifAnim.value === 'shine') {
+          shineX = -100 + progress * (outW + 200);
+        }
+      }
+
+      ctx.globalAlpha = op * extraAlpha;
+
+      ctx.font = 'bold 32px ' + font;
+      ctx.fillStyle = nameColor.value;
+      ctx.strokeStyle = sc;
+      ctx.lineWidth = swStroke * 2;
       const title = titleInput.value.trim() || 'Nombre del logro';
+      if (swStroke > 0) {
+        wrapTextStroke(ctx, title, textX, 70, maxTextWidth, 38);
+      }
       wrapText(ctx, title, textX, 70, maxTextWidth, 38);
 
-      ctx.fillStyle = '#a0a0b0';
-      ctx.font = '20px "Segoe UI", system-ui, sans-serif';
+      ctx.font = '20px ' + font;
+      ctx.fillStyle = descColor.value;
       const desc = descInput.value.trim() || '';
       if (desc) {
+        if (swStroke > 0) {
+          wrapTextStroke(ctx, desc, textX, 120, maxTextWidth, 28);
+        }
         wrapText(ctx, desc, textX, 120, maxTextWidth, 28);
       }
 
-      const link = document.createElement('a');
-      const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
-      link.download = 'logro-' + safeName + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
+      ctx.globalAlpha = 1;
+
+      if (gifMode.checked && gifAnim.value === 'shine') {
+        const grd = ctx.createLinearGradient(shineX - 80, 0, shineX + 80, 0);
+        grd.addColorStop(0, 'rgba(255,255,255,0)');
+        grd.addColorStop(0.5, 'rgba(255,255,255,0.25)');
+        grd.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, outW, outH);
+      }
+    }
 
     function wrapText(context, text, x, y, maxWidth, lineHeight) {
       const words = text.split(' ');
       let line = '';
       let currentY = y;
-
       for (let i = 0; i < words.length; i++) {
         const testLine = line + words[i] + ' ';
-        const metrics = context.measureText(testLine);
-        if (metrics.width > maxWidth && i > 0) {
+        if (context.measureText(testLine).width > maxWidth && i > 0) {
           context.fillText(line.trim(), x, currentY);
           line = words[i] + ' ';
           currentY += lineHeight;
@@ -522,6 +718,95 @@
       }
       context.fillText(line.trim(), x, currentY);
     }
+
+    function wrapTextStroke(context, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        if (context.measureText(testLine).width > maxWidth && i > 0) {
+          context.strokeText(line.trim(), x, currentY);
+          line = words[i] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.strokeText(line.trim(), x, currentY);
+    }
+
+    downloadBtn.addEventListener('click', async () => {
+      if (!currentImage) return;
+
+      if (gifMode.checked) {
+        await generateGif();
+      } else {
+        drawFrame(1);
+        const link = document.createElement('a');
+        const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
+        link.download = 'logro-' + safeName + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        statusEl.textContent = 'PNG descargado';
+        setTimeout(() => statusEl.textContent = '', 2500);
+      }
+    });
+
+    async function generateGif() {
+      if (typeof GIF === 'undefined') {
+        alert('No se pudo cargar la librería GIF. Revisa tu conexión a internet.');
+        return;
+      }
+
+      statusEl.textContent = 'Generando GIF...';
+      downloadBtn.disabled = true;
+
+      const duration = Math.max(0.5, parseFloat(gifDuration.value) || 2);
+      const fps = 12;
+      const totalFrames = Math.round(duration * fps);
+      const delay = Math.round(1000 / fps);
+
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        width: 800,
+        height: 220,
+        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+      });
+
+      for (let i = 0; i < totalFrames; i++) {
+        const progress = i / (totalFrames - 1 || 1);
+        drawFrame(progress);
+        gif.addFrame(ctx, { copy: true, delay: delay });
+      }
+
+      gif.on('finished', function (blob) {
+        const link = document.createElement('a');
+        const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
+        link.download = 'logro-' + safeName + '.gif';
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        statusEl.textContent = 'GIF descargado (' + duration + 's)';
+        downloadBtn.disabled = false;
+        setTimeout(() => statusEl.textContent = '', 3000);
+      });
+
+      gif.on('progress', function (p) {
+        statusEl.textContent = 'Generando GIF... ' + Math.round(p * 100) + '%';
+      });
+
+      gif.render();
+    }
+
+    soundBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = 'emblema.mp3';
+      link.download = 'emblema.mp3';
+      link.click();
+      statusEl.textContent = 'Sonido emblema.mp3 descargado';
+      setTimeout(() => statusEl.textContent = '', 2500);
+    });
 
     resetBtn.addEventListener('click', () => {
       imageInput.value = '';
@@ -534,8 +819,22 @@
       previewImg.style.display = 'none';
       previewImageBox.classList.remove('has-image');
       currentImage = null;
+      fontSelect.value = "'Segoe UI', system-ui, sans-serif";
+      nameColor.value = '#f0c14b';
+      descColor.value = '#a0a0b0';
+      opacityRange.value = 100;
+      strokeColor.value = '#000000';
+      strokeWidth.value = 0;
+      gifMode.checked = false;
+      gifOptions.style.display = 'none';
+      gifDuration.value = 2;
+      downloadBtn.textContent = '⬇️ Descargar imagen';
+      applyPreviewStyles();
       updateDownloadState();
+      statusEl.textContent = '';
     });
+
+    applyPreviewStyles();
   </script>
 </body>
 </html>
