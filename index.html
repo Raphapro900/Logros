@@ -16,11 +16,7 @@
       --gold: #f0c14b;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -31,15 +27,9 @@
       line-height: 1.5;
     }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1100px; margin: 0 auto; }
 
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
+    header { text-align: center; margin-bottom: 32px; }
 
     header h1 {
       font-size: 1.9rem;
@@ -51,10 +41,7 @@
       margin-bottom: 6px;
     }
 
-    header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+    header p { color: var(--muted); font-size: 0.95rem; }
 
     .layout {
       display: grid;
@@ -64,9 +51,7 @@
     }
 
     @media (max-width: 800px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
+      .layout { grid-template-columns: 1fr; }
     }
 
     .panel {
@@ -84,9 +69,7 @@
       margin-bottom: 18px;
     }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
+    .form-group { margin-bottom: 18px; }
 
     label {
       display: block;
@@ -114,10 +97,7 @@
       border-color: var(--accent);
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
+    textarea { resize: vertical; min-height: 80px; }
 
     .upload-zone {
       border: 2px dashed var(--border);
@@ -139,21 +119,15 @@
     .upload-zone input[type="file"] {
       position: absolute;
       inset: 0;
+      width: 100%;
+      height: 100%;
       opacity: 0;
       cursor: pointer;
+      z-index: 2;
     }
 
-    .upload-zone .icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
-      opacity: 0.7;
-    }
-
-    .upload-zone p {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
+    .upload-zone .icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.7; }
+    .upload-zone p { font-size: 0.9rem; color: var(--muted); }
     .upload-zone .filename {
       margin-top: 8px;
       font-size: 0.82rem;
@@ -176,9 +150,7 @@
       transition: background 0.2s, transform 0.1s;
     }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
+    .btn:active { transform: scale(0.98); }
 
     .btn-primary {
       background: var(--accent);
@@ -186,9 +158,7 @@
       margin-top: 8px;
     }
 
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
+    .btn-primary:hover { background: var(--accent-hover); }
 
     .btn-primary:disabled {
       opacity: 0.45;
@@ -208,11 +178,7 @@
       color: var(--text);
     }
 
-    .preview-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    .preview-wrap { display: flex; flex-direction: column; gap: 16px; }
 
     .preview-card {
       background: linear-gradient(145deg, #1e1e28, #16161e);
@@ -231,28 +197,39 @@
     .ach-image {
       width: 140px;
       min-width: 140px;
+      height: 140px;
       background: #0d0d12;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       position: relative;
+      flex-shrink: 0;
     }
 
     .ach-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none;
+      display: block;
     }
 
     .ach-image .placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--muted);
       font-size: 0.8rem;
       text-align: center;
       padding: 12px;
       opacity: 0.6;
+      background: #0d0d12;
+      z-index: 1;
     }
+
+    .ach-image.has-image .placeholder { display: none; }
 
     .ach-content {
       flex: 1;
@@ -262,6 +239,7 @@
       justify-content: center;
       gap: 6px;
       border-left: 1px solid rgba(255, 255, 255, 0.06);
+      min-width: 0;
     }
 
     .ach-name {
@@ -296,9 +274,7 @@
       text-align: center;
     }
 
-    canvas {
-      display: none;
-    }
+    canvas { display: none; }
 
     .footer-note {
       margin-top: 28px;
@@ -354,5 +330,212 @@
           </div>
           <div class="preview-card" style="border: none; border-radius: 0; box-shadow: none;">
             <div class="achievement" id="preview">
-              <div class="ach-image" id="previewImage">
-                <div class="placeholder" id="img
+              <div class="ach-image" id="previewImageBox">
+                <div class="placeholder" id="imgPlaceholder">Sin imagen</div>
+                <img id="previewImg" alt="Logro" style="display:none;">
+              </div>
+              <div class="ach-content">
+                <div class="ach-name" id="previewName"></div>
+                <div class="ach-desc" id="previewDesc"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="size-hint">La imagen descargada se genera en alta resolución (800×220 px)</p>
+      </div>
+    </div>
+
+    <p class="footer-note">Todo se procesa en tu navegador. Ninguna imagen se sube a ningún servidor.</p>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const fileName = document.getElementById('fileName');
+    const titleInput = document.getElementById('titleInput');
+    const descInput = document.getElementById('descInput');
+    const previewImg = document.getElementById('previewImg');
+    const previewImageBox = document.getElementById('previewImageBox');
+    const previewName = document.getElementById('previewName');
+    const previewDesc = document.getElementById('previewDesc');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentImage = null;
+
+    titleInput.addEventListener('input', () => {
+      previewName.textContent = titleInput.value;
+      updateDownloadState();
+    });
+
+    descInput.addEventListener('input', () => {
+      previewDesc.textContent = descInput.value;
+      updateDownloadState();
+    });
+
+    imageInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        loadImage(this.files[0]);
+      }
+    });
+
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadZone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files && files[0] && files[0].type.startsWith('image/')) {
+        loadImage(files[0]);
+      }
+    });
+
+    function loadImage(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido.');
+        return;
+      }
+
+      fileName.textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const dataUrl = e.target.result;
+
+        const img = new Image();
+        img.onload = function () {
+          currentImage = img;
+          previewImg.src = dataUrl;
+          previewImg.style.display = 'block';
+          previewImageBox.classList.add('has-image');
+          updateDownloadState();
+        };
+        img.onerror = function () {
+          alert('No se pudo cargar la imagen. Prueba con otro archivo.');
+        };
+        img.src = dataUrl;
+      };
+      reader.onerror = function () {
+        alert('Error al leer el archivo.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateDownloadState() {
+      const hasImage = !!currentImage;
+      const hasText = titleInput.value.trim().length > 0 || descInput.value.trim().length > 0;
+      downloadBtn.disabled = !(hasImage && hasText);
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+
+      const outW = 800;
+      const outH = 220;
+      const imgSize = 220;
+
+      canvas.width = outW;
+      canvas.height = outH;
+
+      const gradient = ctx.createLinearGradient(0, 0, outW, outH);
+      gradient.addColorStop(0, '#1e1e28');
+      gradient.addColorStop(1, '#16161e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, outW, outH);
+
+      ctx.strokeStyle = '#2e2e3a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(1, 1, outW - 2, outH - 2);
+
+      const img = currentImage;
+      const scale = Math.max(imgSize / img.width, outH / img.height);
+      const sw = imgSize / scale;
+      const sh = outH / scale;
+      const sx = (img.width - sw) / 2;
+      const sy = (img.height - sh) / 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, imgSize, outH);
+      ctx.clip();
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, imgSize, outH);
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath();
+      ctx.moveTo(imgSize, 0);
+      ctx.lineTo(imgSize, outH);
+      ctx.stroke();
+
+      const textX = imgSize + 28;
+      const maxTextWidth = outW - textX - 28;
+
+      ctx.fillStyle = '#f0c14b';
+      ctx.font = 'bold 32px "Segoe UI", system-ui, sans-serif';
+      const title = titleInput.value.trim() || 'Nombre del logro';
+      wrapText(ctx, title, textX, 70, maxTextWidth, 38);
+
+      ctx.fillStyle = '#a0a0b0';
+      ctx.font = '20px "Segoe UI", system-ui, sans-serif';
+      const desc = descInput.value.trim() || '';
+      if (desc) {
+        wrapText(ctx, desc, textX, 120, maxTextWidth, 28);
+      }
+
+      const link = document.createElement('a');
+      const safeName = (titleInput.value.trim().slice(0, 30) || 'imagen').replace(/[^\w\sáéíóúñü-]/gi, '').replace(/\s+/g, '-');
+      link.download = 'logro-' + safeName + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = context.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          context.fillText(line.trim(), x, currentY);
+          line = words[i] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line.trim(), x, currentY);
+    }
+
+    resetBtn.addEventListener('click', () => {
+      imageInput.value = '';
+      fileName.textContent = '';
+      titleInput.value = '';
+      descInput.value = '';
+      previewName.textContent = '';
+      previewDesc.textContent = '';
+      previewImg.src = '';
+      previewImg.style.display = 'none';
+      previewImageBox.classList.remove('has-image');
+      currentImage = null;
+      updateDownloadState();
+    });
+  </script>
+</body>
+</html>
