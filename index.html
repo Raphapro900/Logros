@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Logros</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --card: #1a1a22;
+      --border: #2e2e3a;
+      --accent: #6c5ce7;
+      --accent-hover: #5a4bd1;
+      --text: #f0f0f5;
+      --muted: #a0a0b0;
+      --gold: #f0c14b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), #ff9f43);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .panel h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      background: #121218;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.08);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-zone .icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      opacity: 0.7;
+    }
+
+    .upload-zone p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .upload-zone .filename {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    .preview-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .preview-card {
+      background: linear-gradient(145deg, #1e1e28, #16161e);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .achievement {
+      display: flex;
+      align-items: stretch;
+      min-height: 140px;
+    }
+
+    .ach-image {
+      width: 140px;
+      min-width: 140px;
+      background: #0d0d12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ach-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .ach-image .placeholder {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 12px;
+      opacity: 0.6;
+    }
+
+    .ach-content {
+      flex: 1;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .ach-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .ach-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .ach-name:empty::before {
+      content: "Nombre del logro";
+      color: #555;
+      font-weight: 500;
+    }
+
+    .ach-desc:empty::before {
+      content: "Descripción del logro...";
+      color: #444;
+    }
+
+    .size-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏆 Generador de Logros</h1>
+      <p>Sube una imagen, escribe el nombre y la descripción, y descarga tu logro</p>
+    </header>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Configuración</h2>
+
+        <div class="form-group">
+          <label>Imagen del logro</label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="imageInput" accept="image/*">
+            <div class="icon">📷</div>
+            <p>Haz clic o arrastra una imagen</p>
+            <div class="filename" id="fileName"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="titleInput">Nombre del logro</label>
+          <input type="text" id="titleInput" placeholder="Ej: Maestro del código" maxlength="60">
+        </div>
+
+        <div class="form-group">
+          <label for="descInput">Descripción</label>
+          <textarea id="descInput" placeholder="Ej: Completaste todos los desafíos de programación" maxlength="180"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="downloadBtn" disabled>
+          ⬇️ Descargar imagen
+        </button>
+        <button class="btn btn-secondary" id="resetBtn">
+          Limpiar todo
+        </button>
+      </div>
+
+      <div class="preview-wrap">
+        <div class="panel" style="padding: 0; overflow: hidden;">
+          <div style="padding: 14px 18px; border-bottom: 1px solid var(--border);">
+            <h2 style="margin: 0;">Vista previa</h2>
+          </div>
+          <div class="preview-card" style="border: none; border-radius: 0; box-shadow: none;">
+            <div class="achievement" id="preview">
+              <div class="ach-image" id="previewImage">
+                <div class="placeholder" id="img
